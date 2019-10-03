@@ -338,8 +338,8 @@ public class SkystoneTeleOp extends LinearOpMode {
 
             // Next, translate the camera lens to where it is on the robot.
             // In this example, it is centered (left to right), but forward of the middle of the robot, and above ground level.
-            final float CAMERA_FORWARD_DISPLACEMENT  = 16.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
-            final float CAMERA_VERTICAL_DISPLACEMENT = 6.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
+            final float CAMERA_FORWARD_DISPLACEMENT  = 9.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
+            final float CAMERA_VERTICAL_DISPLACEMENT = 4.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
             final float CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
 
             // Set up the parameters with which we will use our IMU. Note that integration
@@ -484,17 +484,17 @@ public class SkystoneTeleOp extends LinearOpMode {
                         // Test all new code under Gamepad 1 Left Bumper
                         if (gamepad1.left_bumper)
                         {
-                            gyroTurn(1, findAngle(30, 0), 5000);
+                            gyroTurn(1, findAngle(0, 0), 10000);
 
-                            telemetry.addData("Angle -x and -y: ", findAngle(30, 0));
+                            telemetry.addData("Angle -x and -y: ", findAngle(0, 0));
                             telemetry.update();
 
+                            sleep(500);
+
+                            encoderDrive(0.3, findDistance(0, 0), findDistance(0, 0), 5);
+                            telemetry.addData("Distance: ", findDistance(0, 0));
+                            telemetry.update();
                             sleep(2000);
-
-                            encoderDrive(0.3, findDistance(30, 0), findDistance(30, 0), 5);
-                            telemetry.addData("Distance: ", findDistance(30, 0));
-                            telemetry.update();
-                            sleep(5000);
                         }
 
 
@@ -502,11 +502,13 @@ public class SkystoneTeleOp extends LinearOpMode {
                         {
 
                             // gyroTurn(1, findAngle(100, 100), 3000);
-                            telemetry.addData("Angle -y : ", findAngle(40, 0));
+                            //telemetry.addData("Angle -y : ", findAngle(0, 0));
                             //telemetry.addData("Angle Megean: ", findAngleMegan(10, 10));
                             // telemetry.addData("Distance to point: ", findDistance(10, 10));
+
+                            driveToPoint(30, 0, true);
                             telemetry.update();
-                            sleep(10000);
+                            sleep(500);
                         }
 
                         // express position (translation) of robot in inches.
@@ -1165,6 +1167,60 @@ public class SkystoneTeleOp extends LinearOpMode {
 
             //  sleep(250);   // optional pause after each move
         }
+    }
+    
+    public void driveToPoint (double x, double y, boolean yFirst)
+    {
+        gyroTurn(1, 0, 2000);
+        double dX = x - xAverage();
+        double yD = y - yAverage();
+
+
+
+        if (yFirst)
+        {
+            if (yD > 0)
+            {
+                gyroTurn(1, 90, 2000);
+            }
+            else
+            {
+                gyroTurn(1, -90, 2000);
+            }
+            encoderDrive( 0.4, Math.abs(yD), Math.abs(yD), 2000);
+            if (dX > 0)
+            {
+                gyroTurn(1, 0, 2000);
+            }
+            else
+            {
+                gyroTurn(1, 180, 2000);
+            }
+            encoderDrive(0.4, Math.abs(dX), Math.abs(dX), 2000);
+        }
+        else
+        {
+            if (dX > 0)
+            {
+                gyroTurn(1, 0, 2000);
+            }
+            else
+            {
+                gyroTurn(1, 180, 2000);
+            }
+            encoderDrive(0.4, dX, dX, 2000);
+            if (yD > 0)
+            {
+                gyroTurn(1, 90, 2000);
+            }
+            else
+            {
+                gyroTurn(1, -90, 2000);
+            }
+            encoderDrive( 0.4, yD, yD, 2000);
+        }
+
+
     }
 }
 
