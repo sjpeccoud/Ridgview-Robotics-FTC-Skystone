@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.RidgeviewRoboticsFTCSkystone13022;
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class PID_Controller {
 
@@ -8,6 +10,8 @@ public class PID_Controller {
     private double dCoeff;
     private double sumError, prevError;
     private double prevPrevError;
+
+    ElapsedTime turnTime = new ElapsedTime();
 
     // Constructor
     public PID_Controller(double pCoeff, double iCoeff, double dCoeff)
@@ -37,7 +41,7 @@ public class PID_Controller {
 
     boolean checkTimeOut(double error)
     {
-        if (Math.abs(error - prevPrevError) == 0)
+        if (Math.abs(error - prevPrevError) == 0 && error < 1000)
         {
             return false;
         }
@@ -50,15 +54,38 @@ public class PID_Controller {
 
     boolean checkTimeOutGyro(double error)
     {
-        double tolerance = 5;
-        if (Math.abs(error - prevPrevError) == 0 && error < tolerance)
+        turnTime.reset();
+        double tolerance = 0.5;
+        double timeOut = 2;
+
+
+            if (error < tolerance)
+            {
+                return false;
+            } else
+            {
+                return true;
+            }
+
+
+
+    }
+
+    boolean checkTimeOutGyro2(double error, double timeOut)
+    {
+        double tolerance = 7;
+        while(turnTime.seconds() < timeOut)
         {
-            return false;
+            if (Math.abs(error - prevPrevError) == 0 && error < tolerance)
+            {
+                return false;
+            } else
+            {
+                return true;
+            }
         }
-        else
-        {
-            return true;
-        }
+
+        return false;
 
     }
 
